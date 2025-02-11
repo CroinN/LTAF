@@ -329,11 +329,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   _groundCheckPosition: {fileID: 4534326241601861600}
-  _groundCheckRadius: 0.5
-  _walkSpeed: 5
-  _sprintSpeed: 10
-  _maxVelocityChange: 5
-  _jumpForce: 6
+  _staminaStats:
+    maxStamina: 100
+    staminaRegenerationAmount: 10
+    jumpStaminaCost: 40
+    sprintStaminaCost: 30
+  _movementStats:
+    walkSpeed: 5
+    sprintSpeed: 10
+    maxVelocityChange: 5
+    groundCheckRadius: 0.5
+    jumpForce: 6
 --- !u!114 &8346687751745065798
 MonoBehaviour:
   m_ObjectHideFlags: 0

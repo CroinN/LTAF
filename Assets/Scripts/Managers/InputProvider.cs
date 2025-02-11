@@ -5,6 +5,7 @@ using UnityEngine;
 public class InputProvider : MonoBehaviour, IService
 {
     public event Action<Vector3> MoveEvent;
+    public event Action<bool> SprintEvent;
     public event Action JumpEvent;
     public event Action<Vector2> RotateEvent;
     public event Action ShootEvent;
@@ -13,6 +14,7 @@ public class InputProvider : MonoBehaviour, IService
     [SerializeField] private KeyCode _moveBackwardKey = KeyCode.S;
     [SerializeField] private KeyCode _moveLeftKey = KeyCode.A;
     [SerializeField] private KeyCode _moveRightKey = KeyCode.D;
+    [SerializeField] private KeyCode _sprintKey = KeyCode.LeftShift;
     [SerializeField] private KeyCode _jumpKey = KeyCode.Space;
     [SerializeField] private float _xSensitivity;
     [SerializeField] private float _ySensitivity;
@@ -49,6 +51,9 @@ public class InputProvider : MonoBehaviour, IService
 
             bool shouldJump = Input.GetKeyDown(_jumpKey);
             bool shouldShoot = Input.GetMouseButton((int)_shootingButton);
+
+            bool isSprinting = Input.GetKey(_sprintKey);
+            SprintEvent?.Invoke(isSprinting);
 
             MoveEvent?.Invoke(direction);
 

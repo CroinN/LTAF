@@ -4,6 +4,7 @@ using UnityEngine;
 public class PlayerInputHandler : MonoBehaviour
 {
     public event Action<Vector3> MoveEvent;
+    public event Action<bool> SprintEvent;
     public event Action JumpEvent;
     public event Action<Vector2> RotateEvent;
     public event Action ShootEvent;
@@ -14,6 +15,7 @@ public class PlayerInputHandler : MonoBehaviour
     {
         _inputProvider = SL.Get<InputProvider>();
         _inputProvider.MoveEvent += OnMove;
+        _inputProvider.SprintEvent += OnSprint;
         _inputProvider.JumpEvent += OnJump;
         _inputProvider.RotateEvent += OnRotate;
         _inputProvider.ShootEvent += OnShoot;
@@ -22,6 +24,11 @@ public class PlayerInputHandler : MonoBehaviour
     private void OnMove(Vector3 direction)
     {
         MoveEvent?.Invoke(direction);
+    }
+
+    private void OnSprint(bool isSprinting)
+    {
+        SprintEvent?.Invoke(isSprinting);
     }
 
     private void OnJump()

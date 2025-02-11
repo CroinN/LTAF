@@ -1,5 +1,4 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class InputProvider : MonoBehaviour, IService
@@ -18,7 +17,6 @@ public class InputProvider : MonoBehaviour, IService
     [SerializeField] private KeyCode _jumpKey = KeyCode.Space;
     [SerializeField] private float _xSensitivity;
     [SerializeField] private float _ySensitivity;
-    [SerializeField] private MouseButton _shootingButton;
     
     private bool _isInputEnabled = true;
 
@@ -50,7 +48,6 @@ public class InputProvider : MonoBehaviour, IService
             direction += Input.GetKey(_moveRightKey) ? Vector3.right : Vector3.zero;
 
             bool shouldJump = Input.GetKeyDown(_jumpKey);
-            bool shouldShoot = Input.GetMouseButton((int)_shootingButton);
 
             bool isSprinting = Input.GetKey(_sprintKey);
             SprintEvent?.Invoke(isSprinting);
@@ -60,11 +57,6 @@ public class InputProvider : MonoBehaviour, IService
             if (shouldJump)
             {
                 JumpEvent?.Invoke();
-            }
-
-            if (shouldShoot)
-            {
-                ShootEvent?.Invoke();
             }
         }
     }

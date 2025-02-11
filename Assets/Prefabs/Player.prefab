@@ -333,7 +333,7 @@ MonoBehaviour:
   _walkSpeed: 5
   _sprintSpeed: 10
   _maxVelocityChange: 5
-  _jumpForce: 10
+  _jumpForce: 6
 --- !u!114 &8346687751745065798
 MonoBehaviour:
   m_ObjectHideFlags: 0

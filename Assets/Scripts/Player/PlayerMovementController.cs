@@ -41,7 +41,7 @@ public class PlayerMovementController : MonoBehaviour
         float speed = _isSprinting ? _sprintSpeed : _walkSpeed;
         Vector3 targetVelocity = transform.forward * _direciton.z + transform.right * _direciton.x;
 
-        targetVelocity = transform.TransformDirection(targetVelocity) * speed;
+        targetVelocity = targetVelocity * speed;
 
         Vector3 velocity = _rigidbody.linearVelocity;
         Vector3 velocityChange = (targetVelocity - velocity);

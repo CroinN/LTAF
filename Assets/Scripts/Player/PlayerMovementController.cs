@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using System;
 using UnityEngine;
 
@@ -27,6 +28,7 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] private StaminaStats _staminaStats;
     [SerializeField] private MovementStats _movementStats;
 
+    private UIManager _uiManager;
     private Rigidbody _rigidbody;
     private Vector3 _direciton;
     private float _stamina;
@@ -46,6 +48,12 @@ public class PlayerMovementController : MonoBehaviour
     {
         _rigidbody = GetComponent<Rigidbody>();
         _stamina = _staminaStats.maxStamina;
+    }
+
+    private void Start()
+    {
+        _uiManager = SL.Get<UIManager>();
+        _uiManager.UpdateStamina(_stamina, _staminaStats.maxStamina);
     }
 
     private void FixedUpdate()
@@ -94,8 +102,8 @@ public class PlayerMovementController : MonoBehaviour
     {
         if ((!_isSprinting || !_isMoving) && _stamina < _staminaStats.maxStamina)
         {
-            float newStamina = _stamina + _staminaStats.staminaRegenerationAmount * Time.deltaTime;
-            _stamina = Mathf.Clamp(newStamina, 0, _staminaStats.maxStamina);
+            float staminaRegenAmount =  _staminaStats.staminaRegenerationAmount * Time.deltaTime;
+            ChangeStamina(staminaRegenAmount);
         }
     }
 
@@ -106,17 +114,34 @@ public class PlayerMovementController : MonoBehaviour
 
     private void Sprint()
     {
-        float newStamina = _stamina - _staminaStats.sprintStaminaCost * Time.deltaTime;
-        _stamina = Mathf.Clamp(newStamina, 0, _staminaStats.maxStamina);
+        float staminacost = _staminaStats.sprintStaminaCost * Time.deltaTime;
+        if (HasEnoughStamina(staminacost))
+        {
+            ChangeStamina(-staminacost);
+        }
     }
 
     public void OnJump()
     {
-        if (IsGrounded && _stamina >= _staminaStats.jumpStaminaCost)
+        float staminacost = _staminaStats.jumpStaminaCost;
+        if (IsGrounded && HasEnoughStamina(staminacost))
         {
-            _stamina -= _staminaStats.jumpStaminaCost;
+            ChangeStamina(-staminacost);
             Jump();
         }
+    }
+
+    private void ChangeStamina(float amount)
+    {
+        float newStamina = _stamina + amount;
+        Assert.IsTrue(newStamina >= 0 && newStamina <= _staminaStats.maxStamina, "Stamina is out of bounds");
+        _stamina = Mathf.Clamp(newStamina, 0, _staminaStats.maxStamina);
+        _uiManager.UpdateStamina(_stamina, _staminaStats.maxStamina);
+    }
+
+    private bool HasEnoughStamina(float amount)
+    {
+        return _stamina >= amount;
     }
 
     private void Jump()

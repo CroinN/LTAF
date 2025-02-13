@@ -112,7 +112,7 @@ public class PlayerMovementController : MonoBehaviour
 
     public void OnJump()
     {
-        if (_stamina >= _staminaStats.jumpStaminaCost)
+        if (IsGrounded && _stamina >= _staminaStats.jumpStaminaCost)
         {
             _stamina -= _staminaStats.jumpStaminaCost;
             Jump();
@@ -121,12 +121,7 @@ public class PlayerMovementController : MonoBehaviour
 
     private void Jump()
     {
-        Collider[] colliders = Physics.OverlapSphere(_groundCheckPosition.position, _movementStats.groundCheckRadius, _groundCheckLayerMask);
-
-        if (colliders.Length > 0)
-        {
-            _rigidbody.AddForce(new Vector3(0f, _movementStats.jumpForce, 0f), ForceMode.Impulse);
-        }
+        _rigidbody.AddForce(new Vector3(0f, _movementStats.jumpForce, 0f), ForceMode.Impulse);
     }
 
     private void OnDrawGizmos()

@@ -111,6 +111,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _abstractBullet: {fileID: 6548492989718687199, guid: 8e434ff9cf72d1e418901a87d04de817, type: 3}
   _shootPoint: {fileID: 1557627057845857520}
+  _weaponStats:
+    damage: 10
+    bulletSpeed: 60
+    bulletLifetime: 3
+    fireRate: 0
+    reloadTime: 0
 --- !u!1 &8627472526217866752
 GameObject:
   m_ObjectHideFlags: 0

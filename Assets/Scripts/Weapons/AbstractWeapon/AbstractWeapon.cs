@@ -4,6 +4,7 @@ public class AbstractWeapon : MonoBehaviour, IWeapon
 {
     [SerializeField] private AbstractBullet _abstractBullet;
     [SerializeField] private Transform _shootPoint;
+    [SerializeField] private WeaponStats _weaponStats;
 
     private GarbageManager _garbageManager;
 
@@ -12,17 +13,21 @@ public class AbstractWeapon : MonoBehaviour, IWeapon
         _garbageManager = SL.Get<GarbageManager>();
     }
 
-    [ContextMenu("TestShoot")]
     public void Shoot()
     {
         AbstractBullet newBullet = CreateBullet();
-        newBullet.Init(transform.forward, 10, 10, 3);
+        newBullet.Init(transform.forward, _weaponStats.damage, _weaponStats.bulletSpeed, _weaponStats.bulletSpeed);
     }
 
     private AbstractBullet CreateBullet()
     {
         AbstractBullet bullet = _garbageManager.CreateGarbage(_abstractBullet, _shootPoint.position, Quaternion.identity);
         return bullet;
+    }
+
+    public void StopShoot()
+    {
+
     }
 
     public void Aim()

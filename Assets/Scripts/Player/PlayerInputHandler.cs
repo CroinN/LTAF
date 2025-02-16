@@ -4,7 +4,7 @@ using UnityEngine;
 public class PlayerInputHandler : MonoBehaviour
 {
     public event Action<Vector3> MoveEvent;
-    public event Action<bool> SprintEvent;
+    public event Action DashEvent;
     public event Action JumpEvent;
     public event Action<Vector2> RotateEvent;
     public event Action ShootEvent;
@@ -15,7 +15,7 @@ public class PlayerInputHandler : MonoBehaviour
     {
         _inputProvider = SL.Get<InputProvider>();
         _inputProvider.MoveEvent += OnMove;
-        _inputProvider.SprintEvent += OnSprint;
+        _inputProvider.DashEvent += OnDash;
         _inputProvider.JumpEvent += OnJump;
         _inputProvider.RotateEvent += OnRotate;
         _inputProvider.ShootEvent += OnShoot;
@@ -26,9 +26,9 @@ public class PlayerInputHandler : MonoBehaviour
         MoveEvent?.Invoke(direction);
     }
 
-    private void OnSprint(bool isSprinting)
+    private void OnDash()
     {
-        SprintEvent?.Invoke(isSprinting);
+        DashEvent?.Invoke();
     }
 
     private void OnJump()

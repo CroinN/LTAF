@@ -4,7 +4,7 @@ using UnityEngine;
 public class InputProvider : MonoBehaviour, IService
 {
     public event Action<Vector3> MoveEvent;
-    public event Action<bool> SprintEvent;
+    public event Action DashEvent;
     public event Action JumpEvent;
     public event Action<Vector2> RotateEvent;
     public event Action ShootEvent;
@@ -13,8 +13,9 @@ public class InputProvider : MonoBehaviour, IService
     [SerializeField] private KeyCode _moveBackwardKey = KeyCode.S;
     [SerializeField] private KeyCode _moveLeftKey = KeyCode.A;
     [SerializeField] private KeyCode _moveRightKey = KeyCode.D;
-    [SerializeField] private KeyCode _sprintKey = KeyCode.LeftShift;
+    [SerializeField] private KeyCode _dashKey = KeyCode.LeftShift;
     [SerializeField] private KeyCode _jumpKey = KeyCode.Space;
+    [SerializeField] private KeyCode _shootKey = KeyCode.Mouse0;
     [SerializeField] private float _xSensitivity;
     [SerializeField] private float _ySensitivity;
     
@@ -34,6 +35,7 @@ public class InputProvider : MonoBehaviour, IService
     {
         HandleMovementInput();
         HandleRotateInput();
+        HandleShootInput();
     }
 
     private void HandleMovementInput()
@@ -47,16 +49,19 @@ public class InputProvider : MonoBehaviour, IService
             direction += Input.GetKey(_moveLeftKey) ? Vector3.left : Vector3.zero;
             direction += Input.GetKey(_moveRightKey) ? Vector3.right : Vector3.zero;
 
-            bool shouldJump = Input.GetKeyDown(_jumpKey);
-
-            bool isSprinting = Input.GetKey(_sprintKey);
-            SprintEvent?.Invoke(isSprinting);
 
             MoveEvent?.Invoke(direction);
+
+            bool shouldJump = Input.GetKeyDown(_jumpKey);
+            bool shouldDash = Input.GetKeyDown(_dashKey);
 
             if (shouldJump)
             {
                 JumpEvent?.Invoke();
+            }
+            if (shouldDash)
+            {
+                DashEvent?.Invoke();
             }
         }
     }
@@ -69,6 +74,17 @@ public class InputProvider : MonoBehaviour, IService
             rotateDirection.x = -Input.GetAxis("Mouse Y") * _ySensitivity;
             rotateDirection.y = Input.GetAxis("Mouse X") * _xSensitivity;
             RotateEvent?.Invoke(rotateDirection);
+        }
+    }
+
+    private void HandleShootInput()
+    {
+        if (_isInputEnabled)
+        {
+            if (Input.GetKeyDown(_shootKey))
+            {
+                ShootEvent?.Invoke();
+            }
         }
     }
 

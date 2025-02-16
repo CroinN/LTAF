@@ -1,5 +1,5 @@
-using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UI;
 
 public class UIStaminaBar : MonoBehaviour

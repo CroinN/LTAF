@@ -16,7 +16,7 @@ public class AbstractWeapon : MonoBehaviour, IWeapon
     public void Shoot()
     {
         AbstractBullet newBullet = CreateBullet();
-        newBullet.Init(transform.forward, 10, 10);
+        newBullet.Init(transform.forward, 10, 10, 3);
     }
 
     private AbstractBullet CreateBullet()

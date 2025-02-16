@@ -1,83 +1,60 @@
-using NUnit.Framework;
 using System;
+using System.Collections;
 using UnityEngine;
 
 [Serializable]
 public struct MovementStats
 {
     public float walkSpeed;
-    public float sprintSpeed;
+    public float dashForce;
+    public float jumpForce;
     public float maxVelocityChange;
     public float groundCheckRadius;
-    public float jumpForce;
-}
-
-[Serializable]
-public struct StaminaStats
-{
-    public float maxStamina;
-    public float staminaRegenerationAmount;
-    public float jumpStaminaCost;
-    public float sprintStaminaCost;
+    public int jumpInSecondLimit;
 }
 
 public class PlayerMovementController : MonoBehaviour
 {
+    public event Action JumpEvent;
+    public event Action DashEvent;
+
+    [SerializeField] private PlayerStaminaController _staminaController;
     [SerializeField] private LayerMask _groundCheckLayerMask;
     [SerializeField] private Transform _groundCheckPosition;
-    [SerializeField] private StaminaStats _staminaStats;
     [SerializeField] private MovementStats _movementStats;
 
-    private UIManager _uiManager;
     private Rigidbody _rigidbody;
     private Vector3 _direciton;
-    private float _stamina;
     private bool _isMoving;
-    private bool _isSprinting;
+    private int _lastSecondJumpCount;
 
-    public bool IsGrounded { 
+    public bool IsGrounded {
         get {
             Collider[] colliders = Physics.OverlapSphere(_groundCheckPosition.position, _movementStats.groundCheckRadius, _groundCheckLayerMask);
             return colliders.Length > 0;
         }
     }
 
-    private bool CanSprint => _isSprinting && _isMoving && _stamina >= _staminaStats.sprintStaminaCost;
-
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
-        _stamina = _staminaStats.maxStamina;
-    }
-
-    private void Start()
-    {
-        _uiManager = SL.Get<UIManager>();
-        _uiManager.UpdateStamina(_stamina, _staminaStats.maxStamina);
     }
 
     private void FixedUpdate()
     {
         Move();
-        RegenerateStamina();
     }
 
     public void OnMove(Vector3 vector)
     {
-        _direciton = vector;
+        Vector3 targetDirection = transform.forward * vector.z + transform.right * vector.x;
+        _direciton = targetDirection.normalized;
     }
 
     private void Move()
     {
         float speed = _movementStats.walkSpeed;
-
-        if (CanSprint)
-        {
-            Sprint();
-            speed = _movementStats.sprintSpeed;
-        }
-
-        Vector3 targetVelocity = transform.forward * _direciton.z + transform.right * _direciton.x;
+        Vector3 targetVelocity = _direciton;
 
         if (targetVelocity.magnitude > 0)
         {
@@ -98,55 +75,52 @@ public class PlayerMovementController : MonoBehaviour
         }
     }
 
-    private void RegenerateStamina()
+    public void OnDash()
     {
-        if ((!_isSprinting || !_isMoving) && _stamina < _staminaStats.maxStamina)
+        if (_staminaController.CanDash)
         {
-            float staminaRegenAmount =  _staminaStats.staminaRegenerationAmount * Time.deltaTime;
-            ChangeStamina(staminaRegenAmount);
+            _staminaController.OnDash();
+            Dash();
+            DashEvent?.Invoke();
         }
     }
 
-    public void OnSprint(bool isSprinting)
+    private void Dash()
     {
-        _isSprinting = isSprinting;
-    }
-
-    private void Sprint()
-    {
-        float staminacost = _staminaStats.sprintStaminaCost * Time.deltaTime;
-        if (HasEnoughStamina(staminacost))
-        {
-            ChangeStamina(-staminacost);
-        }
+        _rigidbody.AddForce(_direciton * _movementStats.dashForce, ForceMode.Impulse);
     }
 
     public void OnJump()
     {
-        float staminacost = _staminaStats.jumpStaminaCost;
-        if (IsGrounded && HasEnoughStamina(staminacost))
+        if (CanJump())
         {
-            ChangeStamina(-staminacost);
+            StartCoroutine(JumpCooldown());
+            _staminaController.OnJump();
             Jump();
+            JumpEvent?.Invoke();
         }
     }
 
-    private void ChangeStamina(float amount)
+    private IEnumerator JumpCooldown()
     {
-        float newStamina = _stamina + amount;
-        Assert.IsTrue(newStamina >= 0 && newStamina <= _staminaStats.maxStamina, "Stamina is out of bounds");
-        _stamina = Mathf.Clamp(newStamina, 0, _staminaStats.maxStamina);
-        _uiManager.UpdateStamina(_stamina, _staminaStats.maxStamina);
-    }
-
-    private bool HasEnoughStamina(float amount)
-    {
-        return _stamina >= amount;
+        _lastSecondJumpCount++;
+        yield return new WaitForSeconds(1f);
+        _lastSecondJumpCount--;
     }
 
     private void Jump()
     {
         _rigidbody.AddForce(new Vector3(0f, _movementStats.jumpForce, 0f), ForceMode.Impulse);
+    }
+
+    public bool CanJump ()
+    {
+        bool hasStamina = _staminaController.CanJump;
+        bool hasJumpLimit = _lastSecondJumpCount < _movementStats.jumpInSecondLimit;
+
+        bool canJump = IsGrounded && hasStamina && hasJumpLimit;
+        
+        return canJump;
     }
 
     private void OnDrawGizmos()

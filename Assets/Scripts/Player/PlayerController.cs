@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -7,13 +8,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerInputHandler _playerInputHandler;
     [SerializeField] private PlayerMovementController _playerMovementController;
     [SerializeField] private PlayerRotateController _playerRotateController;
+    [SerializeField] private PlayerShootingController _playerShootingController;
 
     private void Awake()
     {   
         _playerInputHandler.MoveEvent += OnMove;
         _playerInputHandler.JumpEvent += OnJump;
         _playerInputHandler.RotateEvent += OnRotate;
-        _playerInputHandler.SprintEvent += OnSprint;
+        _playerInputHandler.DashEvent += OnDash;
+        _playerInputHandler.ShootEvent += OnShoot;
     }
 
     private void OnMove(Vector3 direction)
@@ -21,9 +24,9 @@ public class PlayerController : MonoBehaviour
         _playerMovementController.OnMove(direction);  
     }
 
-    private void OnSprint(bool isSprinting)
+    private void OnDash()
     {
-        _playerMovementController.OnSprint(isSprinting);
+        _playerMovementController.OnDash();
     }
 
     private void OnJump()
@@ -35,4 +38,9 @@ public class PlayerController : MonoBehaviour
     {
         _playerRotateController.Rotate(direction);
     }
+    private void OnShoot()
+    {
+        _playerShootingController.Shoot();
+    }
+
 }
